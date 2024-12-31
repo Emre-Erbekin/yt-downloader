@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Downloader</title>
+    <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rye&display=swap"
+        rel="stylesheet">
+
+</head>
+
+<body>
+
+
+    <div class="container">
+
+        <!-- Fixed top header -->
+        <!-- Header -->
+        <header>
+            <div class="header-container">
+                <div class="brand">
+                    <h1>YT Downloader</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#how-to-use">How To Use</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="https://github.com/yourusername/yt-downloader" target="_blank">
+                                <i class="fab fa-github"></i> GitHub
+                            </a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Row 1: URL Input with Icons -->
+        <section class="url-input-section">
+            <div class="url-input-row">
+                <div class="url-input-group">
+                    <input type="text" id="url" placeholder="Enter YouTube URL">
+                    <div class="url-validation">
+                        <i class="fas fa-check-circle valid-icon"></i>
+                        <i class="fas fa-times-circle invalid-icon"></i>
+                    </div>
+                </div>
+                <div class="hidden" id="input-message-box"></div>
+                <div class="info-button-row">
+                    <button id="fetch-info" class="btn primary-button" disabled>
+                        <i class="fas fa-search"></i> Check Video
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Row 2: Video Info Section -->
+        <!-- Video Info Section -->
+        <section class="video-info-section hidden">
+            <div class="video-info-container">
+                <h2 class="video-title"></h2>
+                <hr>
+                <div class="download-options">
+                    <div class="download-option">
+                        <label for="download-video">Video Quality</label>
+                        <button id="download-video" class="btn secondary-button">
+                            <i class="fas fa-video"></i> Download
+                        </button>
+                    </div>
+                    <div class="download-option">
+                        <label for="download-audio">Audio Only</label>
+                        <button id="download-audio" class="btn secondary-button">
+                            <i class="fas fa-music"></i> Download
+                        </button>
+                    </div>
+                    <div class="download-option">
+                        <label for="download-both">Full Media</label>
+                        <button id="download-both" class="btn secondary-button">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+                <div class="download-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span class="progress-status">Preparing download...</span>
+                        <span class="progress-percentage">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+
+        <script type="module" src="/js/main.js"></script>
+</body>
+
+</html>
