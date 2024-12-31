@@ -3,12 +3,12 @@ import ytdl from '@distube/ytdl-core';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import fs from 'fs';
 
 // Set FFmpeg path
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+ffmpeg.setFfmpegPath(ffmpegPath);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -124,29 +124,48 @@ app.post('/api/download', async (req, res) => {
         if (type === 'audio') {
             // create a readable stream from the incoming audio stream
             const audioStream = stream;
+            const tempInputFile = path.join(__dirname, `video.${format.container}`);
+            const tempOutputFile = path.join(__dirname, `audio.mp3`);
 
-            // create a response stream to pipe the converted audio to
-            const mp3Stream = ffmpeg()
-                .input(audioStream)
-                .inputOptions('-vn') // No video, just audio
-                .audioCodec('libmp3lame')
-                .format('mp3') // Set the output format to mp3
-                .pipe(); // Directly pipe the conversion output
-
-            // Send the converted audio directly to the response
-            mp3Stream.pipe(res);
-
-            // Optionally, listen to the end event to clean up, if needed
-            mp3Stream.on('end', () => {
-                console.log('Conversion completed and sent to client.');
+            // pipe the incoming audio stream to a temporary file
+            const fileStream = fs.createWriteStream(tempInputFile);
+            await new Promise((resolve, reject) => {
+                audioStream.pipe(fileStream)
+                    .on('finish', resolve)
+                    .on('data', (chunk) => {
+                        console.log('Downloading...');
+                    })
+                    .on('error', reject);
             });
 
-            mp3Stream.on('error', (err) => {
-                console.error('Conversion error:', err);
-                if (!res.headersSent) {
-                    res.status(500).json({ error: err.message || 'Conversion failed' });
-                }
+            fileStream.on('close', () => {
+                console.log('Download finished');
             });
+
+            fileStream.on('finish', () => {
+                // convert the temporary file to mp3
+                console.log('Converting to mp3...');
+                ffmpeg(tempInputFile)
+                    .inputOptions('-vn') // No video, just audio
+                    .audioCodec('libmp3lame')
+                    .format('mp3') // Set the output format to mp3
+                    .on('end', () => {
+                        // send the converted audio to the response
+                        const mp3Stream = fs.createReadStream(tempOutputFile);
+                        mp3Stream.pipe(res);
+                    })
+                    .on('progress', (progress) => {
+                        console.log(`Converting: ${progress.percent}%`);
+                    })
+                    .on('error', (err) => {
+                        console.error('Conversion error:', err);
+                        if (!res.headersSent) {
+                            res.status(500).json({ error: err.message || 'Conversion failed' });
+                        }
+                    })
+                    .save(tempOutputFile);
+            }
+            );
         }
         else {
             // Directly pipe video streams
